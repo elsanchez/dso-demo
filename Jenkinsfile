@@ -85,8 +85,7 @@ pipeline {
               sh 'mvn package -DskipTests'
             }
           }
-
-	}
+	      }
         stage('OCI Image BnP') {
           steps {
             container('kaniko') {
@@ -94,6 +93,25 @@ pipeline {
             }
           }
         }
+      }
+    }
+
+    stage('Image Analysis') {
+      parallel {
+        stage('Image Linting') {
+          steps {
+            container('docker-tools') {
+              sh 'dockle docker.io/elsanchez/dso-demo'
+            }
+          }
+        }
+        // stage('Image Scan') {
+        //   steps {
+        //     container('docker-tools') {
+        //       sh 'trivy image --exit-code 1 elsanchez/dso-demo'
+        //     }
+        //   }
+        // }
       }
     }
 
